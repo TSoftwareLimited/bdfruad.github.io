@@ -1,149 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fraud Checker Pro | BD</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #030712; }
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fraud Checker</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #4f46e5, #9333ea, #ec4899);
+      min-height: 100vh;
+    }
+  </style>
 </head>
-<body class="min-h-screen text-slate-200 flex flex-col items-center justify-center p-4">
+<body class="flex items-center justify-center p-4 text-white">
 
-    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-lg h-64 bg-indigo-600/10 blur-[120px] -z-10"></div>
+  <div class="w-full max-w-3xl bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl p-6">
 
-    <main class="glass-effect w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl">
-        <header class="text-center mb-8">
-            <h1 class="text-3xl font-black tracking-tight text-white italic">
-                FRAUD<span class="text-indigo-500 text-not-italic">CHECKER</span>
-            </h1>
-            <p class="text-slate-500 text-[10px] mt-1 uppercase tracking-[0.2em] font-bold">Courier Reliability DB</p>
-        </header>
+    <!-- Header -->
+    <h1 class="text-3xl font-bold text-center mb-4">
+      🔍 Fraud Checker
+    </h1>
 
-        <form id="checkerForm" class="space-y-4">
-            <input 
-                type="text" 
-                id="phone" 
-                placeholder="Enter Number (e.g. 01310886225)" 
-                required
-                class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-indigo-500 transition-all font-mono text-lg text-white"
-            >
-            <button 
-                type="submit" 
-                class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold py-4 rounded-2xl transition-all active:scale-95"
-            >
-                ANALYZE NUMBER
-            </button>
-        </form>
+    <!-- Input -->
+    <div class="flex gap-2 mb-6">
+      <input 
+        id="phoneInput"
+        type="text"
+        placeholder="Enter phone number..."
+        class="flex-1 px-4 py-2 rounded-lg text-black outline-none"
+      />
+      <button 
+        onclick="checkFraud()"
+        class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg font-semibold"
+      >
+        Check
+      </button>
+    </div>
 
-        <div id="loader" class="hidden mt-8 text-center space-y-3">
-            <div class="inline-block w-8 h-8 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
-            <p class="text-slate-500 text-xs font-medium">Bypassing CORS & Fetching...</p>
+    <!-- Result -->
+    <div id="result" class="hidden space-y-4">
+
+      <!-- Summary -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <div class="bg-white/20 p-4 rounded-xl">
+          <p class="text-sm">Total Orders</p>
+          <h2 id="totalOrders" class="text-xl font-bold"></h2>
         </div>
 
-        <div id="resultArea" class="hidden mt-8 space-y-4">
-            <div class="flex justify-between items-center p-4 bg-white/5 rounded-2xl border border-white/10">
-                <span id="riskBadge" class="text-[10px] font-black px-3 py-1 rounded-full uppercase"></span>
-                <span id="displayPhone" class="font-mono font-bold text-indigo-300"></span>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-                <div class="bg-white/5 p-4 rounded-2xl border border-white/5 text-center">
-                    <p class="text-[9px] text-slate-500 uppercase font-bold mb-1">Total Orders</p>
-                    <p id="totalOrders" class="text-2xl font-black text-white"></p>
-                </div>
-                <div class="bg-white/5 p-4 rounded-2xl border border-white/5 text-center">
-                    <p class="text-[9px] text-slate-500 uppercase font-bold mb-1">Success Rate</p>
-                    <p id="successRate" class="text-2xl font-black text-white"></p>
-                </div>
-            </div>
-
-            <div id="courierList" class="space-y-2">
-                </div>
-
-            <div class="bg-black/40 p-4 rounded-2xl border border-white/5">
-                <p class="text-[9px] text-slate-500 uppercase font-bold mb-2">Detailed Statistics</p>
-                <div class="grid grid-cols-2 gap-4 text-xs">
-                    <div class="text-emerald-400">Success: <span id="rSucc" class="font-bold"></span></div>
-                    <div class="text-rose-400">Failed: <span id="rFail" class="font-bold"></span></div>
-                </div>
-            </div>
+        <div class="bg-green-500/30 p-4 rounded-xl">
+          <p class="text-sm">Success</p>
+          <h2 id="successOrders" class="text-xl font-bold"></h2>
         </div>
 
-        <div id="errorArea" class="hidden mt-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-400 text-xs text-center">
-            <p id="errorMsg"></p>
-            <p class="mt-2 text-[10px] opacity-60">Check Console (F12) for more details.</p>
+        <div class="bg-red-500/30 p-4 rounded-xl">
+          <p class="text-sm">Failed</p>
+          <h2 id="failedOrders" class="text-xl font-bold"></h2>
         </div>
-    </main>
 
-    <script>
-        const form = document.getElementById('checkerForm');
-        const loader = document.getElementById('loader');
-        const resultArea = document.getElementById('resultArea');
-        const errorArea = document.getElementById('errorArea');
+        <div class="bg-blue-500/30 p-4 rounded-xl">
+          <p class="text-sm">Success Rate</p>
+          <h2 id="successRate" class="text-xl font-bold"></h2>
+        </div>
+      </div>
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const phoneValue = document.getElementById('phone').value.trim();
+      <!-- Risk -->
+      <div class="bg-white/20 p-4 rounded-xl text-center">
+        <p class="text-sm">Risk Status</p>
+        <h2 id="riskStatus" class="text-2xl font-bold"></h2>
+      </div>
 
-            loader.classList.remove('hidden');
-            resultArea.classList.add('hidden');
-            errorArea.classList.add('hidden');
+      <!-- Courier Stats -->
+      <div>
+        <h3 class="text-lg font-semibold mb-2">Courier Stats</h3>
+        <div id="couriers" class="grid md:grid-cols-2 gap-3"></div>
+      </div>
 
-            try {
-                // We use corsproxy.io but add a cache-buster to ensure fresh data
-                const target = `https://fraudchecker.pro.bd/api/check?phone=${phoneValue}`;
-                const proxy = `https://corsproxy.io/?${encodeURIComponent(target)}&t=${Date.now()}`;
+    </div>
 
-                const response = await fetch(proxy);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP Error: ${response.status}`);
-                }
-                
-                const data = await response.json();
+    <!-- Footer -->
+    <p class="text-center text-sm mt-6 opacity-80">
+      Powered by 
+      <a href="https://fraudchecker.pro.bd" target="_blank" class="underline">
+        fraudchecker.pro.bd
+      </a>
+    </p>
 
-                // Mapping Data
-                document.getElementById('displayPhone').textContent = data.phone;
-                document.getElementById('totalOrders').textContent = data.totalOrders;
-                document.getElementById('successRate').textContent = data.successRate + '%';
-                document.getElementById('rSucc').textContent = data.successOrders;
-                document.getElementById('rFail').textContent = data.failedOrders;
+  </div>
 
-                // Risk Badge
-                const badge = document.getElementById('riskBadge');
-                badge.textContent = data.riskStatus;
-                // Add API color class or default to amber if it matches the warning
-                badge.className = `text-[10px] font-black px-3 py-1 rounded-full uppercase ${data.riskColor || 'text-amber-500 bg-amber-500/10'}`;
+  <script>
+    async function checkFraud() {
+      const phone = document.getElementById("phoneInput").value;
+      if (!phone) return alert("Enter phone number");
 
-                // Courier Breakdown (Only show active ones)
-                const cList = document.getElementById('courierList');
-                cList.innerHTML = '';
-                data.courierStats.filter(c => c.total > 0).forEach(c => {
-                    cList.innerHTML += `
-                        <div class="flex justify-between items-center px-4 py-2 bg-white/5 rounded-xl border border-white/5 text-[11px]">
-                            <span class="text-slate-400">${c.displayName}</span>
-                            <span class="font-mono text-indigo-400">${c.success} / ${c.total}</span>
-                        </div>
-                    `;
-                });
+      const url = `https://fraudchecker.pro.bd/api/check?phone=${phone}`;
 
-                loader.classList.add('hidden');
-                resultArea.classList.remove('hidden');
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
 
-            } catch (err) {
-                console.error("Fetch Error:", err);
-                loader.classList.add('hidden');
-                errorArea.classList.remove('hidden');
-                document.getElementById('errorMsg').textContent = `Request Failed: ${err.message}`;
-            }
+        document.getElementById("result").classList.remove("hidden");
+
+        // Summary
+        document.getElementById("totalOrders").innerText = data.totalOrders;
+        document.getElementById("successOrders").innerText = data.successOrders;
+        document.getElementById("failedOrders").innerText = data.failedOrders;
+        document.getElementById("successRate").innerText = data.successRate + "%";
+
+        // Risk
+        const riskEl = document.getElementById("riskStatus");
+        riskEl.innerText = data.riskStatus;
+        riskEl.className = `text-2xl font-bold ${data.riskColor}`;
+
+        // Courier Stats
+        const container = document.getElementById("couriers");
+        container.innerHTML = "";
+
+        data.courierStats.forEach(c => {
+          const card = `
+            <div class="bg-white/20 p-3 rounded-xl">
+              <h4 class="font-semibold">${c.displayName}</h4>
+              <p>Total: ${c.total}</p>
+              <p class="text-green-300">Success: ${c.success}</p>
+              <p class="text-red-300">Failed: ${c.failed}</p>
+            </div>
+          `;
+          container.innerHTML += card;
         });
-    </script>
+
+      } catch (err) {
+        alert("Error fetching data");
+      }
+    }
+  </script>
+
 </body>
 </html>
