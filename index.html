@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fraud Checker Pro | Modern Insights</title>
+    <title>Fraud Checker Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
         .spinner {
             border: 3px solid rgba(255,255,255,0.1);
             border-radius: 50%;
@@ -21,188 +19,89 @@
             height: 24px;
             animation: spin 1s linear infinite;
         }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="min-h-screen bg-[#050505] text-slate-200 flex flex-col items-center justify-center p-6 font-sans">
+<body class="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4">
 
-    <div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-900/20 rounded-full blur-[120px] pointer-events-none"></div>
-    <div class="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-900/20 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="glass-card p-8 rounded-3xl w-full max-w-md shadow-2xl">
+        <h1 class="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent text-center">
+            Fraud Checker
+        </h1>
+        <p class="text-slate-400 text-center text-sm mb-8">Enter phone number to check reliability</p>
 
-    <main class="glass-card rounded-[2.5rem] p-8 w-full max-w-lg shadow-2xl relative z-10">
-        
-        <header class="text-center mb-10">
-            <h1 class="text-4xl font-black tracking-tight text-white mb-2">
-                Fraud<span class="text-indigo-500">Checker</span>
-            </h1>
-            <p class="text-slate-400 text-sm font-medium">Verified database for safe deliveries</p>
-        </header>
-
-        <form id="checkForm" class="space-y-4">
-            <div class="relative group">
-                <input 
-                    type="text" 
-                    id="phoneInput" 
-                    placeholder="Enter phone number..." 
-                    required
-                    class="w-full pl-6 pr-14 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white placeholder-slate-500 transition-all font-mono text-lg"
-                >
-                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </div>
-            </div>
-
+        <form id="fraudForm" class="space-y-4">
+            <input 
+                type="text" 
+                id="phone" 
+                placeholder="01310886225" 
+                required
+                class="w-full px-5 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+            >
             <button 
                 type="submit" 
-                class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] flex items-center justify-center space-x-2"
+                class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 font-bold rounded-xl transition-colors shadow-lg shadow-indigo-500/20"
             >
-                <span>Analyze Reliability</span>
+                Check Now
             </button>
         </form>
 
-        <div id="loading" class="hidden mt-10 flex flex-col items-center space-y-4">
+        <div id="loading" class="hidden mt-6 flex flex-col items-center gap-2">
             <div class="spinner"></div>
-            <p class="text-sm text-slate-400 animate-pulse">Querying aggregated sources...</p>
+            <span class="text-xs text-slate-500">Fetching data...</span>
         </div>
 
-        <div id="resultDashboard" class="hidden mt-10 space-y-6 fade-in">
-            
-            <div class="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5">
-                <div>
-                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">Target Identity</p>
-                    <h2 class="text-xl font-mono font-bold text-white" id="rPhone"></h2>
-                </div>
-                <div class="text-right">
-                    <span id="rRisk" class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-tighter"></span>
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-indigo-500/5 border border-indigo-500/20 p-5 rounded-2xl text-center">
-                    <p class="text-[10px] text-indigo-300/60 uppercase font-bold mb-1">Total Orders</p>
-                    <p class="text-4xl font-black text-indigo-400" id="rTotal"></p>
-                </div>
-                <div class="bg-purple-500/5 border border-purple-500/20 p-5 rounded-2xl text-center">
-                    <p class="text-[10px] text-purple-300/60 uppercase font-bold mb-1">Success Rate</p>
-                    <p class="text-4xl font-black text-purple-400" id="rRate"></p>
-                </div>
-            </div>
-
-            <div class="bg-white/5 p-5 rounded-2xl border border-white/5">
-                <div class="flex justify-between text-xs font-bold mb-3">
-                    <span class="text-emerald-400">SUCCESS: <span id="rSuccess"></span></span>
-                    <span class="text-rose-400">FAILED: <span id="rFailed"></span></span>
-                </div>
-                <div class="w-full bg-white/10 rounded-full h-3 overflow-hidden flex">
-                    <div id="barSuccess" class="bg-emerald-500 h-full transition-all duration-1000"></div>
-                    <div id="barFailed" class="bg-rose-500 h-full transition-all duration-1000"></div>
-                </div>
-            </div>
-
-            <div class="space-y-3">
-                <h3 class="text-[10px] text-slate-500 uppercase font-bold tracking-widest ml-1">Courier Intelligence</h3>
-                <div id="rCouriers" class="grid gap-2">
-                    </div>
-            </div>
+        <div id="result" class="hidden mt-6 p-4 bg-black/40 rounded-xl border border-white/5">
+            <pre id="jsonOutput" class="text-[10px] text-emerald-400 font-mono overflow-x-auto"></pre>
         </div>
 
-        <div id="errorContainer" class="hidden mt-6 bg-rose-500/10 border border-rose-500/20 rounded-2xl p-4">
-            <p id="errorMessage" class="text-sm text-rose-400 text-center font-medium"></p>
-        </div>
+        <div id="error" class="hidden mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-center"></div>
+    </div>
 
-    </main>
-
-    <footer class="mt-10 text-center opacity-50 hover:opacity-100 transition-opacity">
-        <p class="text-xs font-medium">
-            System powered by 
-            <a href="https://fraudchecker.pro.bd" target="_blank" class="text-indigo-400 underline decoration-indigo-500/30">fraudchecker.pro.bd</a>
-        </p>
+    <footer class="mt-8 text-slate-600 text-xs">
+        Powered by <a href="https://fraudchecker.pro.bd" class="hover:text-indigo-400">fraudchecker.pro.bd</a>
     </footer>
 
     <script>
-        const form = document.getElementById('checkForm');
-        const loading = document.getElementById('loading');
-        const dashboard = document.getElementById('resultDashboard');
-        const errorContainer = document.getElementById('errorContainer');
-
-        form.addEventListener('submit', async (e) => {
+        document.getElementById('fraudForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const phone = document.getElementById('phoneInput').value.trim();
+            
+            const phone = document.getElementById('phone').value;
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            const errorDiv = document.getElementById('error');
+            const jsonOutput = document.getElementById('jsonOutput');
 
             // Reset UI
-            dashboard.classList.add('hidden');
-            errorContainer.classList.add('hidden');
             loading.classList.remove('hidden');
+            result.classList.add('hidden');
+            errorDiv.classList.add('hidden');
 
             try {
-                // API Request through CORS Proxy
-                const target = `https://fraudchecker.pro.bd/api/check?phone=${phone}`;
-                const proxy = `https://corsproxy.io/?${encodeURIComponent(target)}`;
-                
-                const response = await fetch(proxy);
-                if (!response.ok) throw new Error('Network response was not ok');
-                
+                // Using GET method via CORS Proxy
+                const targetUrl = `https://fraudchecker.pro.bd/api/check?phone=${phone}`;
+                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+
+                const response = await fetch(proxyUrl, {
+                    method: 'GET', // Explicitly using GET method
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch data from API');
+
                 const data = await response.json();
-
-                // Mapping Data to UI
-                document.getElementById('rPhone').textContent = data.phone;
-                document.getElementById('rTotal').textContent = data.totalOrders;
-                document.getElementById('rRate').textContent = data.successRate + '%';
-                document.getElementById('rSuccess').textContent = data.successOrders;
-                document.getElementById('rFailed').textContent = data.failedOrders;
                 
-                // Risk Badge logic
-                const riskElem = document.getElementById('rRisk');
-                riskElem.textContent = data.riskStatus;
-                // Use the API's suggested color class if it exists, otherwise default
-                riskElem.className = `px-4 py-2 rounded-xl text-xs font-black uppercase tracking-tighter bg-white/10 ${data.riskColor || 'text-indigo-400'}`;
-
-                // Bar Visualization
-                const total = data.totalOrders || 1;
-                document.getElementById('barSuccess').style.width = (data.successOrders / total * 100) + '%';
-                document.getElementById('barFailed').style.width = (data.failedOrders / total * 100) + '%';
-
-                // Courier Breakdown
-                const courierList = document.getElementById('rCouriers');
-                courierList.innerHTML = '';
-                
-                const activeCouriers = data.courierStats.filter(c => c.total > 0);
-                if(activeCouriers.length === 0) {
-                    courierList.innerHTML = '<div class="text-center py-4 bg-white/5 rounded-2xl text-slate-500 text-xs italic">No specific courier history reported.</div>';
-                } else {
-                    activeCouriers.forEach(c => {
-                        courierList.innerHTML += `
-                            <div class="flex justify-between items-center p-3 bg-white/5 rounded-xl border border-white/5 text-xs">
-                                <span class="font-bold text-slate-300">${c.displayName}</span>
-                                <div class="flex gap-3">
-                                    <span class="text-emerald-400">S: ${c.success}</span>
-                                    <span class="text-rose-400">F: ${c.failed}</span>
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-
-                loading.classList.add('hidden');
-                dashboard.classList.remove('hidden');
+                // Show Result
+                jsonOutput.textContent = JSON.stringify(data, null, 2);
+                result.classList.remove('hidden');
 
             } catch (err) {
+                errorDiv.textContent = "Error: Could not connect to the service. Please try again.";
+                errorDiv.classList.remove('hidden');
+            } finally {
                 loading.classList.add('hidden');
-                errorContainer.classList.remove('hidden');
-                document.getElementById('errorMessage').textContent = "API Error: Unable to fetch data. Ensure the phone number is correct or try again later.";
             }
         });
     </script>
