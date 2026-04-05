@@ -95,7 +95,7 @@
       const phone = document.getElementById("phoneInput").value;
       if (!phone) return alert("Enter phone number");
 
-      const url = `https://fraudchecker.pro.bd/api/check?phone=${phone}`;
+      const url = `http://fraudchecker.pro.bd/api/check?phone=${phone}`;
 
       try {
         const res = await fetch(url);
